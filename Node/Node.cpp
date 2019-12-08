@@ -236,7 +236,7 @@ int main (int argc, char **argv)
 
 
     // Init Consensus Database & Tables
-    if (Init_Wallance(argv) == -1)
+    if (Init_CWallance(argv) == -1)
         return -1;
 
 
