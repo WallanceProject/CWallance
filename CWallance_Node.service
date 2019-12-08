@@ -1,0 +1,14 @@
+[Unit]
+Description=CWallance Node
+After=network-online.target
+
+[Service]
+ExecStart=/bin/bash /home/pi/CWallance/Run_Node.sh
+WorkingDirectory=/home/pi/CWallance/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
