@@ -6,13 +6,13 @@
 # Init Grafana Server
 if [ $(service grafana-server status | grep Active | awk '{print $2}') == "inactive" ]
 then
-	service grafana-server start
+	service grafana-server restart
 fi
 
 # Init MYSQL
 if [ $(service mysql status | grep Active | awk '{print $2}') == "inactive" ]
 then
-	service mysql start
+	service mysql restart
 fi
 
 # Display Node's ID
