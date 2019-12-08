@@ -220,6 +220,78 @@ void NetworkSend_RequestTransaction(int TXSocket, char* MyCMD)
 
 
 
+/********** From Consensus.cpp (avoid re-compilation of SQLite3) **********/
+
+// Check the Hash of Light PoW according to the difficulty (Number of first nibble to 0)
+// MyString: Hash to check
+// Return:   ERROR (-1) / OK (0)
+int Valid_Hash(string MyString)
+{
+    for (int i=0; i<DIFFICULTY; i++)
+    {
+        if (MyString[i] != '0')
+            return -1;
+    }
+    
+    return 0;
+}
+
+
+
+// Compute the Light Proof of Work (SHA256 of Transaction)
+// MyTX:   Transaction to hash
+// Return: Correct Nonce value
+int Compute_Light_PoW(Transaction MyTX)
+{   
+    char MyCMD[DATA_FORMATING_LENGTH];
+    string MyHash;
+
+    // Init Nonce
+    MyTX.Nonce = 0;
+
+    // Compute Light PoW (LPoW)
+    while(1)
+    {
+        MyHash.clear();
+
+        // Formats all inputs in string format (Subscriber - Publisher - SmartContract - Price - Time - PrevState - DCoin - Nonce)
+        snprintf(MyCMD, DATA_FORMATING_LENGTH, "%s%s%s%d%d%s%d%d", MyTX.Subscriber.c_str(), MyTX.Publisher.c_str(), MyTX.SmartContract.c_str(), MyTX.Price, MyTX.Time, MyTX.PrevState.c_str(), MyTX.DCoin, MyTX.Nonce);
+
+        // Compute SHA256
+        MyHash = sha256(MyCMD); 
+
+        // Check the Hash of Light PoW according to the difficulty (Number of first nibble to 0)
+        if (Valid_Hash(MyHash) == 0)
+            return MyTX.Nonce;
+        else
+            MyTX.Nonce++;
+    }
+}
+
+
+
+// Check the Light Proof of Work (SHA256 of Transaction)
+// MyTX:   Transaction to verify
+// Return: ERROR (-1) / OK (0)
+int Check_Light_PoW(Transaction MyTX)
+{
+    char MyCMD[DATA_FORMATING_LENGTH];
+    string MyHash;
+
+    MyHash.clear();
+
+    // Formats all inputs in string format (Subscriber - Publisher - SmartContract - Price - Time - PrevState - DCoin - Nonce)
+    snprintf(MyCMD, DATA_FORMATING_LENGTH, "%s%s%s%d%d%s%d%d", MyTX.Subscriber.c_str(), MyTX.Publisher.c_str(), MyTX.SmartContract.c_str(), MyTX.Price, MyTX.Time, MyTX.PrevState.c_str(), MyTX.DCoin, MyTX.Nonce);
+
+    // Compute SHA256
+    MyHash = sha256(MyCMD); 
+
+    // Check the Hash of Light PoW according to the difficulty (Number of first nibble to 0)
+    return Valid_Hash(MyHash);
+}
+
+
+
 /********** MAIN PART **********/
 
 int main (int argc, char **argv)
