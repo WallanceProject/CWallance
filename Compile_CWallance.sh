@@ -29,7 +29,7 @@ arm-linux-gnueabihf-g++ -o Node/Node.bin Node/Node.cpp Consensus/Consensus.cpp C
 # ----------------------
 # GRAFANA INTERFACE (PC)
 # ----------------------
-g++ -o Grafana/Grafana_Interface.bin Grafana/Grafana_Interface.cpp Consensus/Consensus.cpp Consensus/SHA256.cpp ../SQLite3/sqlite3.o -lpthread -ldl
+g++ -o Grafana/Grafana_Interface.bin Grafana/Grafana_Interface.cpp Consensus/SHA256.cpp
 
 
 # ----------------------------------------
