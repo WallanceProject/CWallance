@@ -115,8 +115,8 @@ rm CWallance.zip
 find $HOME/WallanceProject/CWallance/ -type f -iname "*.sh" -exec chmod +x {} \;
 
 # Install Grafana Interface
-sudo cp $HOME/WallanceProject/CWallance/Grafana/Wallance_DataSource.yaml /etc/grafana/provisioning/datasources/
-sudo cp $HOME/WallanceProject/CWallance/Grafana/Wallance_Dashboard.js /usr/share/grafana/public/dashboards/
+sudo cp $HOME/WallanceProject/CWallance/Grafana/CWallance_DataSource.yaml /etc/grafana/provisioning/datasources/
+sudo cp $HOME/WallanceProject/CWallance/Grafana/CWallance_Dashboard.js /usr/share/grafana/public/dashboards/
 
 # Install Grafana Interface Buying Request Generator
 sudo cp $HOME/WallanceProject/CWallance/Grafana/Grafana_Interface.desktop /usr/share/applications/
