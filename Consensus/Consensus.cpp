@@ -15,12 +15,12 @@ sqlite3* DB;
 
 
 
-/********** WALLANCE PROTOTYPE DEFINITIONS **********/
+/********** CWALLANCE PROTOTYPE DEFINITIONS **********/
 
-// Init Wallance Database
+// Init CWallance Database
 // argv: 	Launcher Command Arguments
 // Return:	ERROR (-1) / OK (0)
-int Init_Wallance(char **argv)
+int Init_CWallance(char **argv)
 {
 	// Create Node ID from Launcher Command Arguments
 	MyID = argv[1];
