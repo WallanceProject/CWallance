@@ -200,7 +200,7 @@ int NetworkReceive(int RXSocket)
             Parser = strtok(NULL, DATA_DELIMITER);
             MyTX.Nonce = atoi(Parser);
 
-            Add_Transaction(MyTX);         
+            Add_Transaction(MyTX);
         }
 
         return 0;
