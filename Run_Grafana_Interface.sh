@@ -20,11 +20,11 @@ echo "-------------------------"
 echo "YOU ARE GRAFANA INTERFACE"
 echo "-------------------------"
 
-# Start Grafana Interface (Firefox)
-/usr/bin/firefox -new-window http://localhost:3000/dashboard/script/CWallance_Dashboard.js &
-
 # Start CWallance Node (Raspberry)
 ./Start_Node.sh
+
+# Start Grafana Interface (Firefox)
+/usr/bin/firefox -new-window http://localhost:3000/dashboard/script/CWallance_Dashboard.js &
 
 # Start Grafana Interface process
 cd Grafana
