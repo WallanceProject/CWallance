@@ -1,5 +1,5 @@
 [Desktop Entry]
-Exec=sh -c "\$HOME/WallanceProject/Wallance/Grafana/MySQLAccess.sh 5 %U"
+Exec=sh -c "\$HOME/WallanceProject/CWallance/Grafana/MySQLAccess.sh 5 %U"
 Type=Application
 NoDisplay=true
 StartupNotify=false
