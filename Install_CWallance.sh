@@ -17,6 +17,7 @@ sudo apt-get install -y net-tools \
 openssh-server \
 wget \
 nmap \
+make \
 zip
 
 # Create Wallance Project Directory
