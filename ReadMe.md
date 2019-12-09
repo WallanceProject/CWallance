@@ -24,7 +24,18 @@ Download and launch the installer *Install_CWallance.sh*. In a terminal on your 
 chmod +x Install_CWallance.sh
 ./Install_CWallance.sh</code></pre>
 
-At the end of the process, you should see the "WallanceProject" directory in your $HOME with the *pyWallance* directory, described below:
+At the end of the process, you should see the "WallanceProject" directory in your $HOME.<br>
+
+The contents of the "WallanceProject" directory is described below:
+<br><br>
+![](ReadMeImages/WallanceProject.PNG)
+
+| **Directory** | **Description** |
+| :--------------: | :-----------: |
+| *SQLite3* | Database used to store all *CWallance* data |
+| *CWallance* | Source code of our *CWallance* protocol |
+
+The *CWallance* directory tree is described below:
 <br><br>
 ![](ReadMeImages/CWallance.PNG)
 
