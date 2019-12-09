@@ -115,6 +115,7 @@ echo "sudo mv CWallance_Node.service /etc/systemd/system/" >> Install_CWallance_
 echo "sudo systemctl daemon-reload" >> Install_CWallance_Node.sh
 echo "sudo rm -f -R CWallance && mkdir CWallance" >> Install_CWallance_Node.sh
 echo "mv Run_Node.sh Consensus Node SmartContract Sensor Pipes CWallance" >> Install_CWallance_Node.sh
+echo "rm CWallance_Node.zip" >> Install_CWallance_Node.sh
 echo "rm Install_CWallance_Node.sh" >> Install_CWallance_Node.sh
 chmod +x Install_CWallance_Node.sh
 zip -u CWallance_Node.zip Install_CWallance_Node.sh
