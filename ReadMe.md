@@ -32,8 +32,8 @@ The contents of the "WallanceProject" directory is described below:
 
 | **Directory** | **Description** |
 | :--------------: | :-----------: |
-| *SQLite3* | Database used to store all *CWallance* data |
 | *CWallance* | Source code of our *CWallance* protocol |
+| *SQLite3* | Database used to store all *CWallance* data |
 
 The *CWallance* directory tree is described below:
 <br><br>
