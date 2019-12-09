@@ -20,7 +20,7 @@ typedef struct sockaddr_in SOCKADDR_IN;
 // Network Configuration
 #define MULTICAST_IP				"224.168.0.1"
 #define MULTICAST_PORT 				10000
-#define MULTICAST_TTL				0
+#define MULTICAST_TTL				1
 #define MULTICAST_TIMEOUT			2
 
 
