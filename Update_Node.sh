@@ -14,5 +14,5 @@ for ip in $IPs
 do
 	echo "********** Update Node $ip **********"
 	scp CWallance_Node.zip pi@$ip:/home/pi/
-	ssh pi@$ip 'unzip CWallanceDDS_Node.zip && sudo ./Install_CWallanceDDS_Node.sh'
+	ssh pi@$ip 'unzip CWallance_Node.zip && sudo ./Install_CWallance_Node.sh'
 done
