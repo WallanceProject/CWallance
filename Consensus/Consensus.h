@@ -15,7 +15,7 @@ using namespace std;
 /************************/
 #define MAJORITY_THRESHOLD				2.0/3.0		// Must be > 1/2
 #define DIFFICULTY						1			// Number of nipples set to '0' at the beginning of Hash
-#define DCOIN_RATE						2			// Number of shared Sensor value for 1 DCoin
+#define DCOIN_RATE						5			// Number of shared Sensor value for 1 DCoin
 #define DCOIN_REWARD					2			// Number of Sub-division of DCoin for the participation of Consensus
 #define GENESIS_STATE					"0000000000000000000000000000000000000000000000000000000000000000"
 #define TRANSACTION_OUTDATE				5			// Number of Request Transaction of Publisher before removing its old Consensus Transaction

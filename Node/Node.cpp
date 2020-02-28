@@ -255,7 +255,7 @@ int main (int argc, char **argv)
     sleep(5);
 
     // Launch Sensor process
-    system("cd ../Sensor && ./Sensor.bin 8 &");
+    system("cd ../Sensor && ./Sensor.bin 10 &");
 
     signal(SIGINT, CatchSignal);
     while (Running)
