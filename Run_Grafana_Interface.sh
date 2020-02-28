@@ -23,15 +23,15 @@ echo "-------------------------"
 # Start CWallance Node (Raspberry)
 ./Start_Node.sh
 
-# Start Grafana Interface (Firefox)
-/usr/bin/firefox -new-window http://localhost:3000/dashboard/script/CWallance_Dashboard.js &
-
 # Start Grafana Interface process
 cd Grafana
-./Grafana_Interface.bin
+./Grafana_Interface.bin &
 
-# Stop Grafana Interface (Firefox)
-killall -q firefox
+# Start Grafana Interface (Firefox)
+/usr/bin/firefox -new-window http://localhost:3000/dashboard/script/CWallance_Dashboard.js
+
+# Stop Grafana Interface
+killall -SIGINT Grafana_Interface.bin
 
 # Stop CWallance Node (Raspberry)
 cd ../

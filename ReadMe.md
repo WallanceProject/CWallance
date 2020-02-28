@@ -159,8 +159,7 @@ Finally, the consensus process is computed, the *Request Transaction* / *Consens
 ## Stop *CWallance*
 
 Close the Firefox window.<br>
-Stop the Run_Grafana_Interface instance in your PC with <Ctrl+C>.<br>
-The *CWallance* Node instance on each Raspberry will be stopped automatically (using SSH)
+The *CWallance* Grafana Interface and the *CWallance* Node instance on each Raspberry will be stopped automatically (using SSH)
 <br><br>
 
 
