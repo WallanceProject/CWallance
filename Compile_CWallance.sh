@@ -64,6 +64,7 @@ sed -i "s/TRANSACTION_OUTDATE=.*/TRANSACTION_OUTDATE=$Transaction_Outdate/g" Gra
 
 # CWallance_Dashboard.js - DCOIN_RATE
 sed -i "s/SELECT .* AS DCOIN_RATE/SELECT $DCoin_Rate AS DCOIN_RATE/g" Grafana/CWallance_Dashboard.js
+sudo cp $HOME/WallanceProject/CWallance/Grafana/CWallance_Dashboard.js /usr/share/grafana/public/dashboards/
 
 
 # -----------------------------------
