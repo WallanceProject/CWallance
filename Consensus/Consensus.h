@@ -15,7 +15,7 @@ using namespace std;
 /************************/
 #define MAJORITY_THRESHOLD				2.0/3.0		// Must be > 1/2
 #define DIFFICULTY						1			// Number of nipples set to '0' at the beginning of Hash
-#define DCOIN_RATE						5			// Number of shared Sensor value for 1 DCoin
+#define DCOIN_RATE						2			// Number of shared Sensor value for 1 DCoin
 #define DCOIN_REWARD					2			// Number of Sub-division of DCoin for the participation of Consensus
 #define GENESIS_STATE					"0000000000000000000000000000000000000000000000000000000000000000"
 #define TRANSACTION_OUTDATE				5			// Number of Request Transaction of Publisher before removing its old Consensus Transaction
@@ -26,6 +26,8 @@ using namespace std;
 /******************/
 #define DATA_FORMATING_LENGTH			600
 #define DATA_DELIMITER					"_"
+#define REQUEST_TRANSACTION_TYPE		1
+#define CONSENSUS_TRANSACTION_TYPE		2
 
 
 /********************/
@@ -54,6 +56,7 @@ using namespace std;
 /****************************************/
 #define INIT_REQUEST_TRANSACTION		"CREATE TABLE IF NOT EXISTS REQUEST_TRANSACTION (PUBLISHER TEXT, SMARTCONTRACT TEXT, PRICE INTEGER, TIME INTEGER, PREVSTATE TEXT, OUTDATE INTEGER, UNIQUE(PUBLISHER, PREVSTATE));"
 #define DISPLAY_REQUEST_TRANSACTION		"SELECT * FROM REQUEST_TRANSACTION;"
+#define REMAINING_REQUEST_TRANSACTION	"SELECT COUNT(*) FROM REQUEST_TRANSACTION;"
 #define FIND_REQUEST_TRANSACTION		"SELECT * FROM REQUEST_TRANSACTION WHERE " \
 										"PRICE<=(SELECT COUNTER/" STR(DCOIN_RATE) " FROM WALLET WHERE PUBLISHER=REQUEST_TRANSACTION.PUBLISHER) AND " \
 										"PREVSTATE=(SELECT STATE FROM WALLET WHERE PUBLISHER=REQUEST_TRANSACTION.PUBLISHER) LIMIT 1;"
@@ -103,6 +106,13 @@ int Init_CWallance(char **argv);
 
 
 
+// Check if Publisher is already in the Database (Callback)
+// MyResult:  Address to store the result
+// Called by: Update_Wallet_Counter(string Publisher)
+int SQLite_Exist_Publisher_Callback(void *MyResult, int NotUsed, char **Values, char **NotUsed2);
+
+
+
 // Update Wallet Counter of Publisher for sharing a New Sensor value
 // Publisher: Publisher ID of New Sensor value
 void Update_Wallet_Counter(string Publisher);
@@ -139,8 +149,9 @@ int Check_SmartContract(string SmartContract, int Price);
 
 
 // Add New Transaction (Request / Consensus Transaction)
-// MyTX: New Request / Consensus Transaction to add
-void Add_Transaction(Transaction MyTX);
+// MyTX: 	New Request / Consensus Transaction to add
+// Return:	ERROR (-1) / Type of Transaction (Request / Consensus Transaction)
+int Add_Transaction(Transaction MyTX);
 
 
 
@@ -189,6 +200,10 @@ void Start_SmartContract(Transaction Params);
 int Consensus_Process(void);
 
 
+
+// Count the Remaining Requestion Transaction
+// Return: Number of Remaing Request Transactions
+int Remaining_Request_Transaction(void);
 
 
 

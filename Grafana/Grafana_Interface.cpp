@@ -119,12 +119,15 @@ int NetworkReceive(int RXSocket)
 
             // Set End of First Data Part
             if (*Parser == *DATA_DELIMITER)
+            {
                 *Parser = 0;
+                snprintf(MyCMD, DATA_FORMATING_LENGTH, "./MySQLAccess.sh 1 %s", MySerialTX+2);
+                system(MyCMD);
+                return 0;
+            }
+
             else
                 return -1;
-
-            snprintf(MyCMD, DATA_FORMATING_LENGTH, "./MySQLAccess.sh 1 %s", MySerialTX+2);
-            system(MyCMD);
         }
 
         else
@@ -153,21 +156,22 @@ int NetworkReceive(int RXSocket)
             Parser = strtok(NULL, DATA_DELIMITER);
             MyTX.Nonce = atoi(Parser);
 
-            // Check Light PoW
-            if (Check_Light_PoW(MyTX) == 0)
+            // Add New Buying Request
+            if (strcmp(MyTX.Subscriber.c_str(), MyTX.Publisher.c_str()) == 0)
             {
-                // Add New Buying Request
-                if (MyTX.Subscriber == MyTX.Publisher)
-                    snprintf(MyCMD, DATA_FORMATING_LENGTH, "./MySQLAccess.sh 2 %s %s %s %d %d %s %d %d", MyTX.Subscriber.c_str(), MyTX.Publisher.c_str(), MyTX.SmartContract.c_str(), MyTX.Price, MyTX.Time, MyTX.PrevState.c_str(), MyTX.DCoin, MyTX.Nonce);
-
-                // Add New Consensus Response
-                else
-                    snprintf(MyCMD, DATA_FORMATING_LENGTH, "./MySQLAccess.sh 3 %s %s %s %d %d %s %d %d", MyTX.Subscriber.c_str(), MyTX.Publisher.c_str(), MyTX.SmartContract.c_str(), MyTX.Price, MyTX.Time, MyTX.PrevState.c_str(), MyTX.DCoin, MyTX.Nonce);
-
+                snprintf(MyCMD, DATA_FORMATING_LENGTH, "./MySQLAccess.sh 2 %s %s %s %d %d %s %d %d", MyTX.Subscriber.c_str(), MyTX.Publisher.c_str(), MyTX.SmartContract.c_str(), MyTX.Price, MyTX.Time, MyTX.PrevState.c_str(), MyTX.DCoin, MyTX.Nonce);
                 system(MyCMD);
+                return REQUEST_TRANSACTION_TYPE;
+            }
+
+            // Add New Consensus Response
+            else
+            {
+                snprintf(MyCMD, DATA_FORMATING_LENGTH, "./MySQLAccess.sh 3 %s %s %s %d %d %s %d %d", MyTX.Subscriber.c_str(), MyTX.Publisher.c_str(), MyTX.SmartContract.c_str(), MyTX.Price, MyTX.Time, MyTX.PrevState.c_str(), MyTX.DCoin, MyTX.Nonce);
+                system(MyCMD);
+                return CONSENSUS_TRANSACTION_TYPE;
             }
         }
-        return 0;
     }
     else
         return -1;
@@ -300,6 +304,7 @@ int main (int argc, char **argv)
     int RXSocket;
     int TXSocket;
 
+    int MyRX = -1;
     char MyCMD[DATA_FORMATING_LENGTH];
 
     // Reading Pipes: Web Interface -> Grafana Interface
@@ -326,16 +331,18 @@ int main (int argc, char **argv)
     while (Running)
     {
         // Read Pipe: Data from Grafana Interface to send on network
-        while (fgets(MyCMD, sizeof(MyCMD), Pipe_Web_to_Grafana) != NULL)
-        {
+        if (fgets(MyCMD, sizeof(MyCMD), Pipe_Web_to_Grafana) != NULL)
             NetworkSend_RequestTransaction(TXSocket, MyCMD);
-        }
 
         // Listen Network
-        while (NetworkReceive(RXSocket) != -1);
+        MyRX = NetworkReceive(RXSocket);
 
-        // Consensus
-        system("./MySQLAccess.sh 4");
+        // Execute Consensus
+        if (MyRX == CONSENSUS_TRANSACTION_TYPE)
+            system("./MySQLAccess.sh 4");
+
+        // Sampling
+        sleep(0.2);
     }
 
     fclose(Pipe_Web_to_Grafana);

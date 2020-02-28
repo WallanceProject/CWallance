@@ -136,7 +136,7 @@ void NetworkSend_Transaction(int TXSocket, Transaction MyTX)
     snprintf(MySerialTX, DATA_FORMATING_LENGTH, "%s%s%s%s%s%s%d%s%d%s%s%s%d%s%d", \
             MyTX.Subscriber.c_str(), DATA_DELIMITER, MyTX.Publisher.c_str(), DATA_DELIMITER, MyTX.SmartContract.c_str(), DATA_DELIMITER, MyTX.Price, DATA_DELIMITER, MyTX.Time, DATA_DELIMITER, MyTX.PrevState.c_str(), DATA_DELIMITER, MyTX.DCoin, DATA_DELIMITER, MyTX.Nonce);
 
-    // Send Data to the Network
+    // Send Transaction to the Network
     sendto(TXSocket, MySerialTX, strlen(MySerialTX), 0, (struct sockaddr*) &TXConfig, sizeof(TXConfig));
 }
 
@@ -167,11 +167,13 @@ int NetworkReceive(int RXSocket)
 
             // Set End of First Data Part
             if (*Parser == *DATA_DELIMITER)
+            {
                 *Parser = 0;
+                Update_Wallet_Counter(MySerialTX+2);
+                return 0;
+            }
             else
                 return -1;
-
-            Update_Wallet_Counter(MySerialTX+2);
         }
 
         else
@@ -200,10 +202,10 @@ int NetworkReceive(int RXSocket)
             Parser = strtok(NULL, DATA_DELIMITER);
             MyTX.Nonce = atoi(Parser);
 
-            Add_Transaction(MyTX);
+            // Add Request/Consensus Transaction
+            // Return ERROR (-1) / Type of Transaction (Request Transaction / Consensus Transaction)
+            return Add_Transaction(MyTX);
         }
-
-        return 0;
     }
     else
         return -1;
@@ -219,6 +221,8 @@ int main (int argc, char **argv)
     int MySensor;
 
     // Local Transaction
+    int MyRX = -1;
+    int AnyRequest = 0;
     Transaction MyTX;
 
     // Network
@@ -244,14 +248,14 @@ int main (int argc, char **argv)
     RXSocket = NetworkInitRXSocket();
     TXSocket = NetworkInitTXSocket();
 
-    if ( (RXSocket == -1) || (TXSocket == -1) ) 
+    if ( (RXSocket == -1) || (TXSocket == -1) )
         return -1;
 
     // Wait for other Participants
-    sleep(4);
+    sleep(5);
 
     // Launch Sensor process
-    system("cd ../Sensor && ./Sensor.bin &");
+    system("cd ../Sensor && ./Sensor.bin 5 &");
 
     signal(SIGINT, CatchSignal);
     while (Running)
@@ -262,17 +266,29 @@ int main (int argc, char **argv)
             NetworkSend_SensorData(TXSocket, MySensor);
 
         // Listen Network
-        while (NetworkReceive(RXSocket) != -1);
+        MyRX = NetworkReceive(RXSocket);
 
-        // Generate Consensus Transaction
-        while(Generate_Consensus_Transaction(&MyTX) != -1)
+        // New Request Transaction available
+        if (MyRX == REQUEST_TRANSACTION_TYPE)
+            AnyRequest++;
+
+        // Try to Generate Consensus Transaction
+        if (AnyRequest > 0)
         {
-            // Send New Transactions
-            NetworkSend_Transaction(TXSocket, MyTX);
+            if(Generate_Consensus_Transaction(&MyTX) != -1)
+            {
+                // Send Request Transaction
+                NetworkSend_Transaction(TXSocket, MyTX);
+                AnyRequest--;
+            }
         }
 
         // Execute Consensus
-        while(Consensus_Process() != -1);
+        if (MyRX == CONSENSUS_TRANSACTION_TYPE)
+        {
+            while(Consensus_Process() != -1);
+            AnyRequest = Remaining_Request_Transaction();
+        }
     }
 
     // Close Pipe, Sockets & Database

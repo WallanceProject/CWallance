@@ -109,7 +109,7 @@ zip -x SmartContract/*/*.c* -x SmartContract/*/*.h \
 # Create Install CWallance Node Script
 MyCMD='#!/bin/bash\n\n'
 echo -e $MyCMD > Install_CWallance_Node.sh
-echo -e "sudo apt-get update\nsudo apt-get install -y net-tools" >> Install_CWallance_Node.sh
+#echo -e "sudo apt-get update\nsudo apt-get install -y net-tools" >> Install_CWallance_Node.sh
 echo "find \$(pwd) -type f -iname \"*.sh\" -exec chmod +x {} \;" >> Install_CWallance_Node.sh
 echo "sudo mv CWallance_Node.service /etc/systemd/system/" >> Install_CWallance_Node.sh
 echo "sudo systemctl daemon-reload" >> Install_CWallance_Node.sh

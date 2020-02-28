@@ -44,18 +44,24 @@ ssize_t Write_Pipe(const char* Pipe_Name, const void *mydata, size_t count)
 
 /********** MAIN PART **********/
 
+// argv[0]: Name of this code
+// argv[1]: Timeout Max to send next Sensor Data
+
 int main (int argc, char **argv)
 {
+	int Sensor_Timeout_Max;
+	int Value = 0;
+
 	// Init Random Generator
 	srand(time(NULL));
 
-	int Value = 0;
+	Sensor_Timeout_Max = atoi(argv[1]);
 
 	signal(SIGINT, catch_function);
 	while (interrupt_detected != 1)
 	{
-		// Wait beetween 1 to 20s
-		sleep(rand() % 20 + 1);
+		// Wait beetween 1 to Sensor_Timeout_Max s
+		sleep(rand() % Sensor_Timeout_Max + 1);
 
 		Value += 1;
 

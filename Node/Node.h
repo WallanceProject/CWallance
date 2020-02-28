@@ -14,14 +14,15 @@
 #include "../Consensus/Consensus.h"
 #include "../Sensor/Sensor.h"
 
-// Set Socket Configuration Type
-typedef struct sockaddr_in SOCKADDR_IN;
-
 // Network Configuration
 #define MULTICAST_IP				"224.168.0.1"
 #define MULTICAST_PORT 				10000
 #define MULTICAST_TTL				1
 #define MULTICAST_TIMEOUT			2
+
+
+// Set Socket Configuration Type
+typedef struct sockaddr_in SOCKADDR_IN;
 
 
 typedef struct SensorTransaction SensorTransaction;

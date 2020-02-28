@@ -46,26 +46,53 @@ int Init_CWallance(char **argv)
 
 
 
+// Check if Publisher is already in the Database (Callback)
+// MyResult:  Address to store the result
+// Called by: Update_Wallet_Counter(string Publisher)
+int SQLite_Exist_Publisher_Callback(void *MyResult, int NotUsed, char **Values, char **NotUsed2)
+{
+	// Check Correct Responses of SQLite
+	// BOOL
+	if (Values[0] == NULL)
+		return -1;
+
+	// New / Exist
+	*((int*)MyResult) = atoi(Values[0]);
+	return 0;
+}
+
+
+
 // Update Wallet Counter of Publisher for sharing a New Sensor value
 // Publisher: Publisher ID of New Sensor value
 void Update_Wallet_Counter(string Publisher)
 {
 	char MyCMD[DATA_FORMATING_LENGTH];
+	int New = -1;
 
-	// Increase Wallet value by 1 && Delete Previous Wallet value
-	snprintf(MyCMD, DATA_FORMATING_LENGTH, "INSERT INTO WALLET (PUBLISHER,COUNTER,STATE) " \
-										   "VALUES ('%s', " \
-										   "(SELECT COALESCE( (SELECT COUNTER FROM WALLET WHERE PUBLISHER='%s')+1,1)), " \
-										   "(SELECT COALESCE( (SELECT STATE FROM WALLET WHERE PUBLISHER='%s'),'%s'))); " \
-										   "DELETE FROM WALLET WHERE PUBLISHER='%s' AND " \
-										   "COUNTER<(SELECT MAX(COUNTER) FROM WALLET WHERE PUBLISHER='%s');", Publisher.c_str(), Publisher.c_str(), Publisher.c_str(), GENESIS_STATE, Publisher.c_str(), Publisher.c_str());
+	snprintf(MyCMD, DATA_FORMATING_LENGTH, "SELECT COUNTER FROM WALLET WHERE PUBLISHER='%s';", Publisher.c_str());
+	sqlite3_exec(DB, MyCMD, SQLite_Exist_Publisher_Callback, &New, NULL);
+
+	// New Publisher
+	if (New == -1)
+	{
+		// Create Publisher's Wallet
+		snprintf(MyCMD, DATA_FORMATING_LENGTH, "INSERT INTO WALLET (PUBLISHER,COUNTER,STATE) VALUES('%s', 1, '%s');", Publisher.c_str(), GENESIS_STATE);
+	}
+
+	// Update Publisher's Wallet
+	else
+	{
+		// Increase Wallet value by 1
+		snprintf(MyCMD, DATA_FORMATING_LENGTH, "UPDATE WALLET SET COUNTER=COUNTER+1 WHERE PUBLISHER='%s';", Publisher.c_str());
+	}
 
 	sqlite3_exec(DB, MyCMD, NULL, NULL, NULL);
 }
 
 
 
-// Check the Hash of Light PoW according to the difficulty (Number of first nibble to 0)
+// Check the Hash of Light PoW according to the Difficulty (Number of first nibble to 0)
 // MyString: Hash to check
 // Return:	 ERROR (-1) / OK (0)
 int Valid_Hash(string MyString)
@@ -103,7 +130,7 @@ int Compute_Light_PoW(Transaction MyTX)
 		// Compute SHA256
 		MyHash = sha256(MyCMD);	
 
-		// Check the Hash of Light PoW according to the difficulty (Number of first nibble to 0)
+		// Check the Hash of Light PoW according to the Difficulty (Number of first nibble to 0)
 		if (Valid_Hash(MyHash) == 0)
 			return MyTX.Nonce;
 		else
@@ -150,8 +177,9 @@ int Check_SmartContract(string SmartContract, int Price)
 
 
 // Add New Transaction (Request / Consensus Transaction)
-// MyTX: New Request / Consensus Transaction to add
-void Add_Transaction(Transaction MyTX)
+// MyTX: 	New Request / Consensus Transaction to add
+// Return:	ERROR (-1) / Type of Transaction (Request / Consensus Transaction)
+int Add_Transaction(Transaction MyTX)
 {
 	char MyCMD[DATA_FORMATING_LENGTH];
 
@@ -166,7 +194,8 @@ void Add_Transaction(Transaction MyTX)
 												   "INSERT INTO REQUEST_TRANSACTION (PUBLISHER,SMARTCONTRACT,PRICE,TIME,PREVSTATE,OUTDATE) " \
 												   "VALUES ('%s','%s',%d,%d,'%s',%d);", MyTX.Publisher.c_str(), MyTX.Publisher.c_str(), MyTX.Publisher.c_str(), MyTX.SmartContract.c_str(), MyTX.Price, MyTX.Time, MyTX.PrevState.c_str(), TRANSACTION_OUTDATE);
 			sqlite3_exec(DB, MyCMD, NULL, NULL, NULL);
-			Display_Request_Transaction();
+			//Display_Request_Transaction();
+			return REQUEST_TRANSACTION_TYPE;
 		}
 
 		// Add New Consensus Transaction received
@@ -175,9 +204,11 @@ void Add_Transaction(Transaction MyTX)
 			snprintf(MyCMD, DATA_FORMATING_LENGTH, "INSERT INTO CONSENSUS_TRANSACTION (SUBSCRIBER,PUBLISHER,SMARTCONTRACT,PRICE,TIME,PREVSTATE,DCOIN,OUTDATE) "
 												   "VALUES ('%s','%s','%s',%d,%d,'%s',%d,%d);", MyTX.Subscriber.c_str(), MyTX.Publisher.c_str(), MyTX.SmartContract.c_str(), MyTX.Price, MyTX.Time, MyTX.PrevState.c_str(), MyTX.DCoin, TRANSACTION_OUTDATE);
 			sqlite3_exec(DB, MyCMD, NULL, NULL, NULL);
-			Display_Consensus_Transaction();
+			//Display_Consensus_Transaction();
+			return CONSENSUS_TRANSACTION_TYPE;
 		}
 	}
+	return -1;
 }
 
 
@@ -379,9 +410,9 @@ int Consensus_Process(void)
 			Start_SmartContract(ConsTX);
 
 		// Display all States
-		Display_Request_Transaction();
-		Display_Consensus_Transaction();
-		Display_Wallets();
+		//Display_Request_Transaction();
+		//Display_Consensus_Transaction();
+		//Display_Wallets();
 
 		// For Next Majority
 		return 0;
@@ -390,6 +421,19 @@ int Consensus_Process(void)
 	// No Majority
 	else
 		return -1;
+}
+
+
+
+// Count the Remaining Requestion Transaction
+// Return: Number of Remaing Request Transactions
+int Remaining_Request_Transaction(void)
+{
+	int RemaingRequestTx = 0;
+
+	// Use Publisher DCoin SQLite Callback (integer value)
+	sqlite3_exec(DB, REMAINING_REQUEST_TRANSACTION, SQLite_Get_Publisher_DCoin, &RemaingRequestTx, NULL);
+	return RemaingRequestTx;
 }
 
 

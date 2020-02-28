@@ -16,8 +16,6 @@
 
 
 
-
-
 /********** PROTOTYPES **********/
 
 void catch_function(int signo);
